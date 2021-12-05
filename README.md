@@ -6,7 +6,7 @@
 		<img src="https://img.shields.io/codecov/c/gh/benkoska/csv.swift?token=YKK7P9ARXM" alt="Code Coverage" />
     </a>
 	<a href="https://github.com/benkoska/CSV.Swift/releases">
-		<img src="https://img.shields.io/github/release/benkoska/csv.swift.svg" alt="Latest Release">
+		<img src="https://img.shields.io/github/v/tag/benkoska/csv.swift.svg" alt="Latest Release">
 	</a>
 	<a href="https://github.com/benkoska/CSV.Swift/blob/main/LICENSE">
 		<img src="https://img.shields.io/github/license/benkoska/csv.swift.svg" alt="License">
