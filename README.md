@@ -5,10 +5,10 @@
     <a href="https://codecov.io/gh/benkoska/CSV.Swift">
 		<img src="https://img.shields.io/codecov/c/gh/benkoska/csv.swift?token=YKK7P9ARXM" alt="Code Coverage" />
     </a>
-	<a href="https://github.com/alchemy-swift/alchemy/releases">
+	<a href="https://github.com/benkoska/CSV.Swift/releases">
 		<img src="https://img.shields.io/github/release/benkoska/csv.swift.svg" alt="Latest Release">
 	</a>
-	<a href="https://github.com/alchemy-swift/alchemy/blob/main/LICENSE">
+	<a href="https://github.com/benkoska/CSV.Swift/blob/main/LICENSE">
 		<img src="https://img.shields.io/github/license/benkoska/csv.swift.svg" alt="License">
 	</a>
 	<a href="https://swift.org">
