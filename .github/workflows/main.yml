@@ -23,8 +23,12 @@ jobs:
         run: swift build --build-tests
       - name: Run Test
         run: swift test --enable-code-coverage
+      - name: Export Code Coverage
+        run: xcrun llvm-cov export -format="lcov" .build/debug/CSVPackageTests.xctest/Contents/MacOS/CSVPackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2.1.0
+        with:
+          files: ./info.lcov
   linux:
     runs-on: ubuntu-20.04
     container: swiftlang/swift:nightly-focal
@@ -37,6 +41,4 @@ jobs:
       - name: Build
         run: swift build --build-tests --enable-test-discovery
       - name: Run Test
-        run: swift test --enable-test-discovery --enable-code-coverage
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2.1.0
+        run: swift test --enable-test-discovery
