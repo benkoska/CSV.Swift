@@ -52,7 +52,11 @@ After the installation you can import `CSV` in your `.swift` files.
 import CSV
 ```
 
+# Docs
+Docs avaliable at https://docs.benkoska.com/csv
+
 # Usage
+
 ```swift
 let string = "joe,doe,28"
 let parser = try CSVParser(url: url, header: ["firstName", "lastName", "age"])
