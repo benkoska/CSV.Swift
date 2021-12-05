@@ -8,6 +8,7 @@
 import XCTest
 @testable import CSV
 
+#if !os(Linux)
 @available(macOS 12.0.0, *)
 final class CSVParserAsyncTests: XCTestCase {
     let data: Data = "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,1635724859999,53430.40481810,64,0.97545000,51931.96981100,0".data(using: .utf8)!
@@ -73,3 +74,4 @@ final class CSVParserAsyncTests: XCTestCase {
         XCTAssert(parser.next() == nil)
     }
 }
+#endif
