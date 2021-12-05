@@ -27,7 +27,7 @@ jobs:
         uses: codecov/codecov-action@v2.1.0
   linux:
     runs-on: ubuntu-20.04
-    container: swift:5.5.1-focal
+    container: swift:nightly-focal
     steps:
       - uses: actions/checkout@master
       - name: Get Swift Version
