@@ -15,6 +15,14 @@ public class CSVParser {
     var hasHeader: Bool
     var header: [String]?
     
+    /**
+     Creates a new CSV parser
+     
+     - Parameter inputStream: The input stream for CSVParser to use to read data from
+     - Parameter delimiter: Delimiter to be used to signify a new column
+     - Parameter hasHeader: Indicates whether the CSV contains a header
+     - Parameter header: Manually set a header (if set, hasHeader will be disregarded)
+     */
     public init(inputStream: InputStream, delimiter: UInt8 = 0x2C, hasHeader: Bool = false, header: [String]? = nil) {
         self.delimiter = delimiter
         self.reader = BufferedByteReader(inputStream: inputStream)
@@ -28,6 +36,9 @@ public class CSVParser {
         }
     }
     
+    /**
+     Returns the next item parsed as Array of Strings (if not further rows avaliable, returns nil)
+     */
     public func next() -> [String]? {
         var fieldBuffer: [UInt8] = []
         var rowBuffer: [String] = []
@@ -71,6 +82,13 @@ public class CSVParser {
         return !rowBuffer.isEmpty ? rowBuffer : nil
     }
     
+    /**
+     Returns the next item parsed as given Decodable (if not further rows avaliable, returns nil)
+     
+     - Precondition: `header` is set, or `hasHeader` is true, and CSV contains a header
+     - Parameter as: Type that should be used for decoding
+     
+     */
     public func next<T>(as: T.Type) throws -> T? where T: Decodable {
         guard var rawData = next() else {
             return nil
@@ -90,6 +108,11 @@ public class CSVParser {
         return try T(from: CSVRowDecoder(header: header, data: rawData))
     }
     
+    /**
+     Returns the next item as a dictionary (if not further rows avaliable, returns nil)
+     
+     - Precondition: `header` is set, or `hasHeader` is true, and CSV contains a header
+     */
     public func nextAsDict() throws -> [String: String]? {
         guard var rawData = next() else {
             return nil
@@ -124,6 +147,12 @@ public class CSVParser {
         return response
     }
     
+    /**
+     Loads all rows from CSV as String Array
+     
+     - Parameter rowCount: Optional, amount of expected rows
+     - Returns: Array of String Arrays, with each top-level Array Entry representing one row, and each element of given Entry representing one column
+     */
     public func loadAll(rowCount: Int? = nil) -> [[String]]? {
         var response: [[String]] = []
         
@@ -132,6 +161,49 @@ public class CSVParser {
         }
         
         while let row = next() {
+            response.append(row)
+        }
+        
+        return response
+    }
+    
+    /**
+     Loads all rows from CSV as Dictionary ([String: String])
+     
+     - Precondition: `header` is set, or `hasHeader` is true, and CSV contains a header
+     - Parameter rowCount: Optional, amount of expected rows
+     - Returns: Array of Dictionaries, with each Dictionary representing one row
+     */
+    public func loadAllAsDict(rowCount: Int? = nil) throws -> [[String: String]]? {
+        var response: [[String: String]] = []
+        
+        if let rowCount = rowCount {
+            response.reserveCapacity(rowCount)
+        }
+        
+        while let row = try nextAsDict() {
+            response.append(row)
+        }
+        
+        return response
+    }
+    
+    /**
+     Loads all rows from CSV and parses them as given Decodable
+     
+     - Precondition: `header` is set, or `hasHeader` is true, and CSV contains a header
+    
+     - Parameter as: Type that should be used for decoding
+     - Parameter rowCount: Optional, amount of expected rows
+     */
+    public func loadAll<T>(as: T.Type, rowCount: Int? = nil) throws -> [T]? where T: Decodable {
+        var response: [T] = []
+        
+        if let rowCount = rowCount {
+            response.reserveCapacity(rowCount)
+        }
+        
+        while let row = try next(as: T.self) {
             response.append(row)
         }
         

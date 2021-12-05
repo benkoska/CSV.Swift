@@ -1,4 +1,5 @@
 .DS_Store
+generate_docs.sh
 /.build
 /Packages
 /*.xcodeproj
