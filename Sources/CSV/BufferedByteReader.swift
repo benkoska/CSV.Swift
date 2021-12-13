@@ -57,8 +57,6 @@ internal class BufferedByteReader {
             buffer = temp
         }
         
-        temp.deallocate()
-        
         return length
     }
 }
