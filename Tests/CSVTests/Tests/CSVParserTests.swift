@@ -148,7 +148,22 @@ final class CSVParserTests: QuickSpec {
                     expect(row).toNot(beNil())
                 }
             }
-            
+
+            context("parse complex quotation") {
+                let data = "quotation marks \"in the middle\" of a string,\"actual, useful quotation containing delimiter\",\"quotation with \"\"escaped\"\" quotation marks in the middle\",\"\"\"quotation\"\" with escaped quotation marks at the beginning\",\"quotation with escaped quotation marks at the \"\"end\"\"\"".data(using: .utf8)!
+                
+                let parser = CSVParser(data: data)
+                let row = parser.next()
+
+                it("should have correct values") {
+                    expect(row?[0]) == "quotation marks \"in the middle\" of a string"
+                    expect(row?[1]) == "actual, useful quotation containing delimiter"
+                    expect(row?[2]) == "quotation with \"escaped\" quotation marks in the middle"
+                    expect(row?[3]) == "\"quotation\" with escaped quotation marks at the beginning"
+                    expect(row?[4]) == "quotation with escaped quotation marks at the \"end\""
+                }
+            }
+
             context("loadAll") {
                 let parser1 = CSVParser(data: "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0,\"this, that\n& other\",this is \"great\"".data(using: .utf8)!)
                 

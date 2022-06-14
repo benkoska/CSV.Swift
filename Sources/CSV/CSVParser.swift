@@ -54,8 +54,14 @@ public class CSVParser {
         
         while let char = reader.pop()  {
             if isInQuotation {
-                if char == quotationMark && reader.peek() == delimiter {
-                    isInQuotation = false
+                if char == quotationMark {
+                    if reader.peek() == quotationMark {
+                        // two consecutive quotation characters within a quoted field are considered escaped and only added to the field once
+                        fieldBuffer.append(char)
+                        _ = reader.pop()
+                    } else {
+                        isInQuotation = false
+                    }
                 } else {
                     fieldBuffer.append(char)
                 }
