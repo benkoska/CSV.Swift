@@ -14,7 +14,7 @@ import Foundation
 final class CSVParserTests: QuickSpec {
     
     override func spec() {
-        let str = "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,1635724859999,53430.40481810,64,0.97545000,51931.96981100,0\r\n"
+        let str = "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0\r\n"
         let data = str.data(using: .utf8)!
         
         describe("inputStream based parser") {
@@ -27,7 +27,7 @@ final class CSVParserTests: QuickSpec {
                 }
                 
                 it("should have correct values") {
-                    expect(row) ==  ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "1635724859999", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"]
+                    expect(row) ==  ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"]
                 }
                 
                 let parser2 = CSVParser(string: "1,2,3\n4,5,6\n\n")
@@ -74,7 +74,7 @@ final class CSVParserTests: QuickSpec {
                     expect(row2?["low"]) == "53218.59000000"
                     expect(row2?["close"]) == "53233.40000000"
                     expect(row2?["volume"]) == "1.00359000"
-                    expect(row2?["closeTime"]) == "1635724859999"
+                    expect(row2?["closeTime"]) == ""
                     expect(row2?["quoteAssetVolume"]) == "53430.40481810"
                     expect(row2?["numberOfTrades"]) == "64"
                     expect(row2?["takerBaseAssetVolume"]) == "0.97545000"
@@ -110,7 +110,7 @@ final class CSVParserTests: QuickSpec {
                     expect(row?.low) == 53218.59
                     expect(row?.close) == 53233.40
                     expect(row?.volume) == 1.00359
-                    expect(row?.closeTime) == 1635724859999
+                    expect(row?.closeTime).to(beNil())
                     expect(row?.quoteAssetVolume) == 53430.4048181
                     expect(row?.numberOfTrades) == 64
                     expect(row?.takerBaseAssetVolume) == 0.97545
@@ -131,7 +131,7 @@ final class CSVParserTests: QuickSpec {
             }
             
             context("parse header") {
-                let dataWithHeader = "openTime,open,high,low,close,volume,closeTime,quoteAssetVolume,numberOfTrades,takerBaseAssetVolume,takerQuoteAssetVolume,ignore\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,1635724859999,53430.40481810,64,0.97545000,51931.96981100,0".data(using: .utf8)!
+                let dataWithHeader = "openTime,open,high,low,close,volume,closeTime,quoteAssetVolume,numberOfTrades,takerBaseAssetVolume,takerQuoteAssetVolume,ignore\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0".data(using: .utf8)!
                 
                 let parser = CSVParser(data: dataWithHeader, hasHeader: true)
                 let row = try? parser.next(as: BinanceDataEntry.self)
@@ -146,7 +146,7 @@ final class CSVParserTests: QuickSpec {
             }
             
             context("loadAll") {
-                let parser1 = CSVParser(data: "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,1635724859999,53430.40481810,64,0.97545000,51931.96981100,0\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,1635724859999,53430.40481810,64,0.97545000,51931.96981100,0".data(using: .utf8)!)
+                let parser1 = CSVParser(data: "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0".data(using: .utf8)!)
                 
                 let response1 = parser1.loadAll()
                 
@@ -162,7 +162,7 @@ final class CSVParserTests: QuickSpec {
                 }
                 
                 it("should correct values") {
-                    expect(response1) == [["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "1635724859999", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"], ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "1635724859999", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"]]
+                    expect(response1) == [["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"], ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"]]
                 }
                 
                 it("should also correct values") {

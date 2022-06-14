@@ -49,13 +49,11 @@ public class CSVParser {
         
         while let char = reader.pop()  {
             if char == delimiter {
-                if !fieldBuffer.isEmpty {
-                    if let str = String(bytes: fieldBuffer, encoding: .utf8) {
-                        rowBuffer.append(str)
-                    }
-                    
-                    fieldBuffer = []
+                if let str = String(bytes: fieldBuffer, encoding: .utf8) {
+                    rowBuffer.append(str)
                 }
+                
+                fieldBuffer = []
             } else if char == 0x0A || (char == 0x0D && reader.peek() == 0x0A) { // new line (\n or \r\n)
                 if char == 0x0D && reader.peek() == 0x0A {
                     _ = reader.pop()
@@ -66,7 +64,7 @@ public class CSVParser {
                         rowBuffer.append(str)
                     }
                 }
-                
+
                 return !rowBuffer.isEmpty ? rowBuffer : nil
             } else {
                 fieldBuffer.append(char)
@@ -78,7 +76,7 @@ public class CSVParser {
                 rowBuffer.append(str)
             }
         }
-        
+
         return !rowBuffer.isEmpty ? rowBuffer : nil
     }
     

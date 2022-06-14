@@ -14,7 +14,7 @@ struct BinanceDataEntry: Decodable {
     let low: Double
     let close: Double
     let volume: Double
-    let closeTime: Int
+    let closeTime: Int?
     let quoteAssetVolume: Double
     let numberOfTrades: Int
     let takerBaseAssetVolume: Double
