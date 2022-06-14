@@ -200,7 +200,7 @@ internal class CSVSingleValueDecodingContainer: SingleValueDecodingContainer {
     }
     
     func decodeNil() -> Bool {
-        fatalError("decodeNil() has not yet been implemented")
+        return data.isEmpty
     }
     
     func decode(_ type: Bool.Type) throws -> Bool {
