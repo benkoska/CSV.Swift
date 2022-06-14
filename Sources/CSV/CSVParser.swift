@@ -54,7 +54,7 @@ public class CSVParser {
         
         while let char = reader.pop()  {
             if isInQuotation {
-                if char == quotationMark {
+                if char == quotationMark && reader.peek() == delimiter {
                     isInQuotation = false
                 } else {
                     fieldBuffer.append(char)
@@ -78,7 +78,7 @@ public class CSVParser {
                     }
 
                     return !rowBuffer.isEmpty ? rowBuffer : nil
-                } else if char == quotationMark {
+                } else if char == quotationMark && fieldBuffer.isEmpty {
                     isInQuotation = true
                 } else {
                     fieldBuffer.append(char)

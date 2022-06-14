@@ -14,7 +14,7 @@ import Foundation
 final class CSVParserTests: QuickSpec {
     
     override func spec() {
-        let str = "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0,\"this, that\n& other\"\r\n"
+        let str = "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0,\"this, that\n& other\",this is \"great\"\r\n"
         let data = str.data(using: .utf8)!
         
         describe("inputStream based parser") {
@@ -27,7 +27,7 @@ final class CSVParserTests: QuickSpec {
                 }
                 
                 it("should have correct values") {
-                    expect(row) ==  ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0", "this, that\n& other"]
+                    expect(row) ==  ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0", "this, that\n& other", "this is \"great\""]
                 }
                 
                 let parser2 = CSVParser(string: "1,2,3\n4,5,6\n\n")
@@ -53,7 +53,7 @@ final class CSVParserTests: QuickSpec {
                     expect(row1).to(beNil())
                 }
                 
-                let parser2 = CSVParser(data: data, header: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation"])
+                let parser2 = CSVParser(data: data, header: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation", "textThatContainsQuotes"])
                 let row2 = try? parser2.nextAsDict()
                 
                 it("should not be nil") {
@@ -63,7 +63,7 @@ final class CSVParserTests: QuickSpec {
                 it("should have correct keys") {
                     let keys: [String] = row2?.keys != nil ? Array(row2!.keys) : []
                     expect(
-                        keys.containsSameElements(as: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation"])
+                        keys.containsSameElements(as: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation", "textThatContainsQuotes"])
                     ) == true
                 }
                 
@@ -81,6 +81,7 @@ final class CSVParserTests: QuickSpec {
                     expect(row2?["takerQuoteAssetVolume"]) == "51931.96981100"
                     expect(row2?["ignore"]) == "0"
                     expect(row2?["textWithQuotation"]) == "this, that\n& other"
+                    expect(row2?["textThatContainsQuotes"]) == "this is \"great\""
                 }
                 
                 let parser3 = CSVParser(data: "ben,koska\nbill".data(using: .utf8)!, header: ["firstName", "lastName"])
@@ -97,7 +98,7 @@ final class CSVParserTests: QuickSpec {
             }
             
             context("decodable based response") {
-                let parser = CSVParser(data: data, header: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation"])
+                let parser = CSVParser(data: data, header: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation", "textThatContainsQuotes"])
                 let row = try? parser.next(as: BinanceDataEntry.self)
                 
                 it("should not be nil") {
@@ -118,6 +119,7 @@ final class CSVParserTests: QuickSpec {
                     expect(row?.takerQuoteAssetVolume) == 51931.969811
                     expect(row?.ignore) == false
                     expect(row?.textWithQuotation).to(equal("this, that\n& other"))
+                    expect(row?.textThatContainsQuotes).to(equal("this is \"great\""))
                 }
                 
                 let parser2 = CSVParser(string: "firstName,lastName", hasHeader: true)
@@ -133,13 +135,13 @@ final class CSVParserTests: QuickSpec {
             }
             
             context("parse header") {
-                let dataWithHeader = "openTime,open,high,low,close,volume,closeTime,quoteAssetVolume,numberOfTrades,takerBaseAssetVolume,takerQuoteAssetVolume,ignore,textWithQuotation\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0,\"this, that\n& other\"".data(using: .utf8)!
+                let dataWithHeader = "openTime,open,high,low,close,volume,closeTime,quoteAssetVolume,numberOfTrades,takerBaseAssetVolume,takerQuoteAssetVolume,ignore,textWithQuotation,textThatContainsQuotes\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0,\"this, that\n& other\",this is \"great\"".data(using: .utf8)!
                 
                 let parser = CSVParser(data: dataWithHeader, hasHeader: true)
                 let row = try? parser.next(as: BinanceDataEntry.self)
                 
                 it("should have header") {
-                    expect(parser.header) == ["openTime","open","high","low","close","volume","closeTime","quoteAssetVolume","numberOfTrades","takerBaseAssetVolume","takerQuoteAssetVolume","ignore","textWithQuotation"]
+                    expect(parser.header) == ["openTime","open","high","low","close","volume","closeTime","quoteAssetVolume","numberOfTrades","takerBaseAssetVolume","takerQuoteAssetVolume","ignore","textWithQuotation","textThatContainsQuotes"]
                 }
                 
                 it("should not be nil") {
@@ -148,7 +150,7 @@ final class CSVParserTests: QuickSpec {
             }
             
             context("loadAll") {
-                let parser1 = CSVParser(data: "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0,\"this, that\n& other\"".data(using: .utf8)!)
+                let parser1 = CSVParser(data: "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0\n1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,,53430.40481810,64,0.97545000,51931.96981100,0,\"this, that\n& other\",this is \"great\"".data(using: .utf8)!)
                 
                 let response1 = parser1.loadAll()
                 
@@ -164,7 +166,7 @@ final class CSVParserTests: QuickSpec {
                 }
                 
                 it("should correct values") {
-                    expect(response1) == [["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"], ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0", "this, that\n& other"]]
+                    expect(response1) == [["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"], ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "", "53430.40481810", "64", "0.97545000", "51931.96981100", "0", "this, that\n& other", "this is \"great\""]]
                 }
                 
                 it("should also correct values") {

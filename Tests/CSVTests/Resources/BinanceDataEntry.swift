@@ -21,4 +21,5 @@ struct BinanceDataEntry: Decodable {
     let takerQuoteAssetVolume: Double
     let ignore: Bool
     let textWithQuotation: String
+    let textThatContainsQuotes: String
 }
