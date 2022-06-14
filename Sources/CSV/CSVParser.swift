@@ -21,6 +21,7 @@ public class CSVParser {
      
      - Parameter inputStream: The input stream for CSVParser to use to read data from
      - Parameter delimiter: Delimiter to be used to signify a new column
+     - Parameter quotationMark: Character to be used to signify the start/end of a quotation (which may contain delimiters and linebreaks)
      - Parameter hasHeader: Indicates whether the CSV contains a header
      - Parameter header: Manually set a header (if set, hasHeader will be disregarded)
      */

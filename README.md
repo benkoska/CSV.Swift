@@ -87,8 +87,9 @@ try parser.next(as: Person.self) // => Optional<Person(firstName: "joe", lastNam
 ```swift
 let parser = try CSVParser(url: url)
 let parser = try CSVParser(url: url, delimiter: "|")
-let parser = try CSVParser(url: url, delimiter: "|", hasHeader: true)
-let parser = try CSVParser(url: url, delimiter: "|", header: ["firstName", "lastName", "age"])
+let parser = try CSVParser(url: url, delimiter: "|", quotationMark: "'")
+let parser = try CSVParser(url: url, delimiter: "|", quotationMark: "'", hasHeader: true)
+let parser = try CSVParser(url: url, delimiter: "|", quotationMark: "'", header: ["firstName", "lastName", "age"])
 ```
 
 ## Create parser from `String`
@@ -99,16 +100,18 @@ let string3 = "firstName|lastName|age\njoe|doe|28\njane|doe|21"
 
 let parser = try CSVParser(string: string)
 let parser = try CSVParser(string: string2, delimiter: "|")
-let parser = try CSVParser(string: string3, delimiter: "|", hasHeader: true)
-let parser = try CSVParser(string: string2, delimiter: "|", header: ["firstName", "lastName", "age"])
+let parser = try CSVParser(string: string3, delimiter: "|", quotationMark: "'")
+let parser = try CSVParser(string: string3, delimiter: "|", quotationMark: "'", hasHeader: true)
+let parser = try CSVParser(string: string2, delimiter: "|", quotationMark: "'", header: ["firstName", "lastName", "age"])
 ```
 
 ## Create parser from `Data`
 ```swift
 let parser = try CSVParser(data: data)
 let parser = try CSVParser(data: data, delimiter: "|")
-let parser = try CSVParser(data: data, delimiter: "|", hasHeader: true)
-let parser = try CSVParser(data: data, delimiter: "|", header: ["firstName", "lastName", "age"])
+let parser = try CSVParser(data: data, delimiter: "|", quotationMark: "'")
+let parser = try CSVParser(data: data, delimiter: "|", quotationMark: "'", hasHeader: true)
+let parser = try CSVParser(data: data, delimiter: "|", quotationMark: "'", header: ["firstName", "lastName", "age"])
 ```
 
 # Disclaimer
