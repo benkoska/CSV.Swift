@@ -10,6 +10,7 @@ import Foundation
 public class CSVParser {
     
     let delimiter: UInt8
+    let quotationMark: UInt8
     let reader: BufferedByteReader
     
     var hasHeader: Bool
@@ -23,8 +24,9 @@ public class CSVParser {
      - Parameter hasHeader: Indicates whether the CSV contains a header
      - Parameter header: Manually set a header (if set, hasHeader will be disregarded)
      */
-    public init(inputStream: InputStream, delimiter: UInt8 = 0x2C, hasHeader: Bool = false, header: [String]? = nil) {
+    public init(inputStream: InputStream, delimiter: UInt8 = 0x2C, quotationMark: UInt8 = 0x22, hasHeader: Bool = false, header: [String]? = nil) {
         self.delimiter = delimiter
+        self.quotationMark = quotationMark
         self.reader = BufferedByteReader(inputStream: inputStream)
         
         if let header = header {
@@ -47,27 +49,39 @@ public class CSVParser {
             rowBuffer.reserveCapacity(header.count)
         }
         
+        var isInQuotation = false
+        
         while let char = reader.pop()  {
-            if char == delimiter {
-                if let str = String(bytes: fieldBuffer, encoding: .utf8) {
-                    rowBuffer.append(str)
+            if isInQuotation {
+                if char == quotationMark {
+                    isInQuotation = false
+                } else {
+                    fieldBuffer.append(char)
                 }
-                
-                fieldBuffer = []
-            } else if char == 0x0A || (char == 0x0D && reader.peek() == 0x0A) { // new line (\n or \r\n)
-                if char == 0x0D && reader.peek() == 0x0A {
-                    _ = reader.pop()
-                }
-                
-                if !fieldBuffer.isEmpty {
+            } else {
+                if char == delimiter {
                     if let str = String(bytes: fieldBuffer, encoding: .utf8) {
                         rowBuffer.append(str)
                     }
-                }
+                    
+                    fieldBuffer = []
+                } else if char == 0x0A || (char == 0x0D && reader.peek() == 0x0A) { // new line (\n or \r\n)
+                    if char == 0x0D && reader.peek() == 0x0A {
+                        _ = reader.pop()
+                    }
+                    
+                    if !fieldBuffer.isEmpty {
+                        if let str = String(bytes: fieldBuffer, encoding: .utf8) {
+                            rowBuffer.append(str)
+                        }
+                    }
 
-                return !rowBuffer.isEmpty ? rowBuffer : nil
-            } else {
-                fieldBuffer.append(char)
+                    return !rowBuffer.isEmpty ? rowBuffer : nil
+                } else if char == quotationMark {
+                    isInQuotation = true
+                } else {
+                    fieldBuffer.append(char)
+                }
             }
         }
         

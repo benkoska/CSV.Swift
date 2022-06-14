@@ -17,7 +17,10 @@ public enum CSVParserError: Error {
     
     /// Delimiter Character is not ASCII Encodable
     case invalidDelimiter
-    
+
+    /// Quotation Mark  is not ASCII Encodable
+    case invalidQuotationMark
+
     /// Provided String not UTF-8 Encodabe
     case invalidString
     

@@ -11,28 +11,28 @@ import XCTest
 #if !os(Linux)
 @available(macOS 12.0.0, *)
 final class CSVParserAsyncTests: XCTestCase {
-    let data: Data = "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,1635724859999,53430.40481810,64,0.97545000,51931.96981100,0".data(using: .utf8)!
+    let data: Data = "1635724800000,53228.92000000,53265.47000000,53218.59000000,53233.40000000,1.00359000,1635724859999,53430.40481810,64,0.97545000,51931.96981100,0,\"this, that\n& other\"".data(using: .utf8)!
     
     func testAysncCSVParser() async throws {
         let parser = CSVParser(data: data)
         let asyncParser = AsyncCSVParser(parser: parser)
         
         for await item: [String] in asyncParser {
-            XCTAssert(item == ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "1635724859999", "53430.40481810", "64", "0.97545000", "51931.96981100", "0"])
+            XCTAssert(item == ["1635724800000", "53228.92000000", "53265.47000000", "53218.59000000", "53233.40000000", "1.00359000", "1635724859999", "53430.40481810", "64", "0.97545000", "51931.96981100", "0", "this, that\n& other"])
         }
         
         XCTAssert(parser.next() == nil)
     }
     
     func testAsyncDictionaryCSVParser() async throws {
-        let parser = CSVParser(data: data, header: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore"])
+        let parser = CSVParser(data: data, header: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation"])
         let asyncParser = AsyncDictionaryCSVParser(parser: parser)
         
         for try await item: [String: String] in asyncParser {
             let keys: [String] = Array(item.keys)
             
             XCTAssert(
-                keys.containsSameElements(as: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore"])
+                keys.containsSameElements(as: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation"])
             )
             
             XCTAssert(item["openTime"] == "1635724800000")
@@ -47,13 +47,14 @@ final class CSVParserAsyncTests: XCTestCase {
             XCTAssert(item["takerBaseAssetVolume"] == "0.97545000")
             XCTAssert(item["takerQuoteAssetVolume"] == "51931.96981100")
             XCTAssert(item["ignore"] == "0")
+            XCTAssert(item["textWithQuotation"] == "this, that\n& other")
         }
         
         XCTAssert(parser.next() == nil)
     }
     
     func testAsyncCodableCSVParser() async throws {
-        let parser = CSVParser(data: data, header: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore"])
+        let parser = CSVParser(data: data, header: ["openTime", "open", "high", "low", "close", "volume", "closeTime", "quoteAssetVolume", "numberOfTrades", "takerBaseAssetVolume", "takerQuoteAssetVolume", "ignore", "textWithQuotation"])
         let asyncParser = AsyncCodableCSVParser(parser: parser, as: BinanceDataEntry.self)
         
         for try await item: BinanceDataEntry in asyncParser {
@@ -69,6 +70,7 @@ final class CSVParserAsyncTests: XCTestCase {
             XCTAssert(item.takerBaseAssetVolume == 0.97545)
             XCTAssert(item.takerQuoteAssetVolume == 51931.969811)
             XCTAssert(item.ignore == false)
+            XCTAssert(item.textWithQuotation == "this, that\n& other")
         }
         
         XCTAssert(parser.next() == nil)

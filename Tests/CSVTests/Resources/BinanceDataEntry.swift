@@ -20,4 +20,5 @@ struct BinanceDataEntry: Decodable {
     let takerBaseAssetVolume: Double
     let takerQuoteAssetVolume: Double
     let ignore: Bool
+    let textWithQuotation: String
 }
